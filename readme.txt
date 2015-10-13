@@ -58,6 +58,11 @@ To install BuddyRank just follow these steps:
 
 
 
+You may like "BuddyPress Follow" plugin from url : https://wordpress.org/plugins/buddypress-followers/
+* the plugin will added follower's activity rank factor by 100 so it will appear at top rather than other normal activity.
+
+
+
 
 == Screenshots ==
 1. Plugin Activation
@@ -82,3 +87,14 @@ To install BuddyRank just follow these steps:
 =1.0.0=
 
 * Fresh Public setup
+
+
+=1.0.1=
+
+* Added buddypress rank with followers activity rank of multiplication of 100.
+* you should include "BuddyPress Follow" plugin from url : https://wordpress.org/plugins/buddypress-followers/
+
+
+=1.0.2=
+
+* Added buddypress rank with activity type = new_avatar of multiplication of 100.

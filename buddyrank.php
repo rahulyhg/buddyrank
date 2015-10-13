@@ -6,7 +6,7 @@ Description: Buddypress activity main stream listing display by ranking and keyw
 Author: Aheadzen Team | <a href="options-general.php?page=azbpactivity">BuddyRank Settings</a>
 Author URI: http://aheadzen.com/
 Text Domain: aheadzen
-Version: 1.0.0
+Version: 1.0.2
 */
 
 // Exit if accessed directly
@@ -37,7 +37,6 @@ class BP_Loop_Filters {
 		if(!$_GET['buddyrank']){
 			if(!bp_is_activity_directory())return $sql;
 		}
-		
 		global $table_prefix,$wp_query;
 		$disable_filter = get_option('az_activity_disable_filter');
 		$diable_rank = get_option('az_activity_diable_rank');
@@ -60,9 +59,20 @@ class BP_Loop_Filters {
 		}
 		$filter_subsql = apply_filters('buddyrank_sql_where_keyword_filter',$filter_subsql);
 		if(!$diable_rank && class_exists('VoterPluginClass')){
-			//echo current_time( 'mysql', true );
+			$follow_sql='';
+			if(is_user_logged_in() && class_exists('BP_Follow')){
+				$bpfollow = new BP_Follow();
+				$following = $bpfollow->get_following(is_user_logged_in());
+				if($following){
+					$following_ids = implode(',',$following);
+					$follow_sql = "((IFNULL(a.user_id in ($following_ids),0))*100)+";
+				}
+			}
+			
+			$photo_sql = "((IFNULL(a.type='new_avatar',0))*100)+";
+			
 			$now_date = bp_core_current_time();
-			$select_subsql = ",(((select count(v.id) from ".$table_prefix."ask_votes v where v.secondary_item_id=a.id and v.action='up' and v.type='activity' and v.component='buddypress')*100)+IF(TIMESTAMPDIFF(HOUR, '".$now_date."', a.date_recorded) >24, 0, (100/(0.01+TIMESTAMPDIFF(HOUR, a.date_recorded, '".$now_date."'))))+(length(a.content)-length(replace(a.content,' ',''))+1)) as score";
+			$select_subsql = ",( $photo_sql  $follow_sql ((select count(v.id) from ".$table_prefix."ask_votes v where v.secondary_item_id=a.id and v.action='up' and v.type='activity' and v.component='buddypress')*100)+IF(TIMESTAMPDIFF(HOUR, '".$now_date."', a.date_recorded) >24, 0, (100/(0.01+TIMESTAMPDIFF(HOUR, a.date_recorded, '".$now_date."'))))+(length(a.content)-length(replace(a.content,' ',''))+1)) as score";
 			$orderby_str = ' score DESC ';
 			$start1 = 'SELECT ';
 			$end1  = ' FROM ';
@@ -82,6 +92,7 @@ class BP_Loop_Filters {
 		
 		$sql = preg_replace('#('.$start3.')(.*)('.$end3.')#si', "$where $1 $orderby_str $3", $sql);
 		$sql = apply_filters('buddyrank_sql_filter',$sql);
+		echo $sql.'<br /><br />';
 		return $sql;	
 	}
 	
