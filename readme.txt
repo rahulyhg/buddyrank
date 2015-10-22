@@ -98,3 +98,17 @@ You may like "BuddyPress Follow" plugin from url : https://wordpress.org/plugins
 =1.0.2=
 
 * Added buddypress rank with activity type = new_avatar of multiplication of 100.
+
+
+=1.0.3=
+
+* Added buddypress rank with activity type = activity_photo of multiplication of 100.
+	-- added shortcode by buddypress-activity-plus >> https://wordpress.org/plugins/buddypress-activity-plus/
+	
+=1.0.4=
+
+* Added buddypress rank changed
+
+=1.0.5=
+
+* API followers related change - plugin not working for api user follower condition - SOLVED
