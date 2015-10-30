@@ -6,7 +6,7 @@ Description: Buddypress activity main stream listing display by ranking and keyw
 Author: Aheadzen Team | <a href="options-general.php?page=azbpactivity">BuddyRank Settings</a>
 Author URI: http://aheadzen.com/
 Text Domain: aheadzen
-Version: 1.0.5
+Version: 1.0.6
 */
 
 // Exit if accessed directly
@@ -42,6 +42,10 @@ class BP_Loop_Filters {
 		$diable_rank = get_option('az_activity_diable_rank');
 		if($disable_filter && $diable_rank)return $sql;
 		
+		preg_match('#( WHERE )(.*)( ORDER BY )#si',$sql,$whereCondi);
+		$sqlWhereConditions = preg_replace('#a\.#si',"",$whereCondi[2]);
+		$sql = str_replace($whereCondi[0],' ORDER BY ',$sql);		
+		
 		$filter_subsql = '';
 		$select_subsql = '';
 		if(!$disable_filter){
@@ -50,7 +54,7 @@ class BP_Loop_Filters {
 			if($block_kw){
 				$block_kw = explode('<br />',$block_kw);
 				for($k=0;$k<count($block_kw);$k++){
-					$kw_like_sql[] = ' a.content NOT LIKE "%'.trim($block_kw[$k]).'%"';
+					$kw_like_sql[] = ' content NOT LIKE "%'.trim($block_kw[$k]).'%"';
 				}
 				if($kw_like_sql){
 					$filter_subsql = ' AND ('. implode(' AND ',$kw_like_sql).')';
@@ -75,7 +79,6 @@ class BP_Loop_Filters {
 			}
 			
 			$photo_sql = "((IFNULL(a.type='new_avatar',0))*200) + ((IFNULL(a.type='activity_photo',0))*200)+";
-			
 			$now_date = bp_core_current_time();
 			$select_subsql = ",( $photo_sql  $follow_sql ((select count(v.id) from ".$table_prefix."ask_votes v where v.secondary_item_id=a.id and v.action='up' and v.type='activity' and v.component='buddypress')*50)+IF(TIMESTAMPDIFF(HOUR, '".$now_date."', a.date_recorded) >24, 0, (100/(0.01+TIMESTAMPDIFF(HOUR, a.date_recorded, '".$now_date."'))))+(length(a.content)-length(replace(a.content,' ',''))+1)) as score";
 			$orderby_str = ' score DESC ';
@@ -83,21 +86,26 @@ class BP_Loop_Filters {
 			$end1  = ' FROM ';
 			$select_subsql = apply_filters('buddyrank_sql_select_filter',$select_subsql);
 			$sql = preg_replace('#('.$start1.')(.*)('.$end1.')#si', "$1 $2 $select_subsql $3", $sql);
-			$filter_subsql .= ' AND a.component!="votes" ';
+			$filter_subsql .= ' AND component!="votes" ';
 		}else{
 			$orderby_str = '$2';
 		}
 		
-		$where = $filter_subsql;		
+		$where = $filter_subsql;
 		$start3 = 'ORDER BY';
-		$end3  = 'LIMIT';
-		
+		$end3  = 'LIMIT';		
 		$where = apply_filters('buddyrank_sql_where_filter',$where);
-		$orderby_str = apply_filters('buddyrank_sql_orderby_filter',$orderby_str);
+		$orderby_str = apply_filters('buddyrank_sql_orderby_filter',$orderby_str);		
+		$sql = preg_replace('#('.$start3.')(.*)('.$end3.')#si', "$1 $orderby_str $3", $sql);
 		
-		$sql = preg_replace('#('.$start3.')(.*)('.$end3.')#si', "$where $1 $orderby_str $3", $sql);
+		global $wpdb,$table_prefix;
+		$activityTbl = $table_prefix."bp_activity";
+		$sqlWhereConditions = $sqlWhereConditions.$where;
+		$from_subsql = "(select * FROM ".$activityTbl." WHERE ".$sqlWhereConditions." ORDER BY date_recorded DESC limit 5000) as a";
+		$fromActivityTblWhere = $activityTbl.' a';
+		$sql = str_replace($fromActivityTblWhere,$from_subsql,$sql);
+		
 		$sql = apply_filters('buddyrank_sql_filter',$sql);
-		//echo $sql.'<br /><br />';
 		return $sql;	
 	}
 	

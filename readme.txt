@@ -112,3 +112,8 @@ You may like "BuddyPress Follow" plugin from url : https://wordpress.org/plugins
 =1.0.5=
 
 * API followers related change - plugin not working for api user follower condition - SOLVED
+
+
+=1.0.6=
+
+* Optimization
