@@ -32,6 +32,14 @@ class Az_Bp_Activity_Filter {
 			update_option('az_activity_bl_kw',$_POST['az_activity_bl_kw']);
 			update_option('az_activity_disable_filter',$_POST['az_activity_disable_filter']);
 			update_option('az_activity_diable_rank',$_POST['az_activity_diable_rank']);
+			
+			update_option('azbr_follower_weightage',$_POST['azbr_follower_weightage']);
+			update_option('azbr_newavatar_weightage',$_POST['azbr_newavatar_weightage']);
+			update_option('azbr_activityphoto_weightage',$_POST['azbr_activityphoto_weightage']);
+			update_option('azbr_votedcount_weightage',$_POST['azbr_votedcount_weightage']);
+			update_option('azbr_last24hr_weightage',$_POST['azbr_last24hr_weightage']);
+			update_option('azbr_contentlength_weightage',$_POST['azbr_contentlength_weightage']);
+			
 			echo '<script>window.location.href="'.admin_url().'options-general.php?page=azbpactivity&msg=success";</script>';
 			exit;
 		}
@@ -79,6 +87,56 @@ class Az_Bp_Activity_Filter {
 					<input type="checkbox" <?php if($diable_rank){echo 'checked';}?> name="az_activity_diable_rank" id="az_activity_diable_rank" >
 					<?php _e('Disable activity rank ?','aheadzen');?></p>
 					</label>
+					</td>
+				</tr>
+				
+				<tr valign="top"><td style="margin-bottom:0;padding-bottom: 0;"><h3 style="margin-bottom:0;"><?php _e('BuddyRank Weightage','aheadzen');?></h3></td></tr>
+				<tr valign="top">
+					<td style="padding-bottom: 0;">
+					<label for="azbr_last24hr_weightage">
+					<p><?php _e('Last 24 hrs Activity (default is : 100)','aheadzen');?></p>
+					<p><input type="text" name="azbr_last24hr_weightage" value="<?php echo get_option('azbr_last24hr_weightage');?>"></p>
+					</label>					
+					</td>
+				</tr>
+				<tr valign="top">
+					<td style="padding-bottom: 0;">
+					<label for="azbr_newavatar_weightage">
+					<p><?php _e('New Avatar Activity (default is : 200)','aheadzen');?></p>
+					<p><input type="text" name="azbr_newavatar_weightage" value="<?php echo get_option('azbr_newavatar_weightage');?>"></p>
+					</label>					
+					</td>
+				</tr>
+				<tr valign="top">
+					<td style="padding-bottom: 0;">
+					<label for="azbr_activityphoto_weightage">
+					<p><?php _e('Activity Photo (default is : 200)','aheadzen');?></p>
+					<p><input type="text" name="azbr_activityphoto_weightage" value="<?php echo get_option('azbr_activityphoto_weightage');?>"></p>
+					</label>					
+					</td>
+				</tr>
+				<tr valign="top">
+					<td style="padding-bottom: 0;">
+					<label for="azbr_follower_weightage">
+					<p><?php _e('Followers Activity (default is : 100)','aheadzen');?></p>
+					<p><input type="text" name="azbr_follower_weightage" value="<?php echo get_option('azbr_follower_weightage');?>"></p>
+					</label>					
+					</td>
+				</tr>
+				<tr valign="top">
+					<td style="padding-bottom: 0;">
+					<label for="azbr_votedcount_weightage">
+					<p><?php _e('Voted Count (default is : 50)','aheadzen');?></p>
+					<p><input type="text" name="azbr_votedcount_weightage" value="<?php echo get_option('azbr_votedcount_weightage');?>"></p>
+					</label>					
+					</td>
+				</tr>
+				<tr valign="top">
+					<td style="padding-bottom: 0;">
+					<label for="azbr_contentlength_weightage">
+					<p><?php _e('Content Lenght (default is : 1)','aheadzen');?></p>
+					<p><input type="text" name="azbr_contentlength_weightage" value="<?php echo get_option('azbr_contentlength_weightage');?>"></p>
+					</label>					
 					</td>
 				</tr>
 				

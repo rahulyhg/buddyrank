@@ -6,7 +6,7 @@ Description: Buddypress activity main stream listing display by ranking and keyw
 Author: Aheadzen Team | <a href="options-general.php?page=azbpactivity">BuddyRank Settings</a>
 Author URI: http://aheadzen.com/
 Text Domain: aheadzen
-Version: 1.0.6
+Version: 1.0.7
 */
 
 // Exit if accessed directly
@@ -69,18 +69,32 @@ class BP_Loop_Filters {
 			}else if($_GET['currentUserId']){
 				$userID = $_GET['currentUserId'];
 			}
+			
+			$follower_weightage = get_option('azbr_follower_weightage');
+			if(!$follower_weightage){$follower_weightage=100;}
+			$newavatar_weightage = get_option('azbr_newavatar_weightage');
+			if(!$newavatar_weightage){$newavatar_weightage=200;}
+			$activityphoto_weightage = get_option('azbr_activityphoto_weightage');
+			if(!$activityphoto_weightage){$activityphoto_weightage=200;}
+			$votedcount_weightage = get_option('azbr_votedcount_weightage');
+			if(!$votedcount_weightage){$votedcount_weightage=50;}
+			$last24hr_weightage = get_option('azbr_last24hr_weightage');
+			if(!$last24hr_weightage){$last24hr_weightage=100;}
+			$contentlength_weightage = get_option('azbr_contentlength_weightage');
+			if(!$contentlength_weightage){$contentlength_weightage=1;}
+			
 			if($userID && class_exists('BP_Follow')){
 				$bpfollow = new BP_Follow();
 				$following = $bpfollow->get_following($userID);
 				if($following){
 					$following_ids = implode(',',$following);
-					$follow_sql = "((IFNULL(a.user_id in ($following_ids),0))*100)+";
+					$follow_sql = "((IFNULL(a.user_id in ($following_ids),0))*".$follower_weightage.")+";
 				}
 			}
 			
-			$photo_sql = "((IFNULL(a.type='new_avatar',0))*200) + ((IFNULL(a.type='activity_photo',0))*200)+";
+			$photo_sql = "((IFNULL(a.type='new_avatar',0))*".$newavatar_weightage.") + ((IFNULL(a.type='activity_photo',0))*".$activityphoto_weightage.")+";
 			$now_date = bp_core_current_time();
-			$select_subsql = ",( $photo_sql  $follow_sql ((select count(v.id) from ".$table_prefix."ask_votes v where v.secondary_item_id=a.id and v.action='up' and v.type='activity' and v.component='buddypress')*50)+IF(TIMESTAMPDIFF(HOUR, '".$now_date."', a.date_recorded) >24, 0, (100/(0.01+TIMESTAMPDIFF(HOUR, a.date_recorded, '".$now_date."'))))+(length(a.content)-length(replace(a.content,' ',''))+1)) as score";
+			$select_subsql = ",( $photo_sql  $follow_sql ((select count(v.id) from ".$table_prefix."ask_votes v where v.secondary_item_id=a.id and v.action='up' and v.type='activity' and v.component='buddypress')*".$votedcount_weightage.")+IF(TIMESTAMPDIFF(HOUR, '".$now_date."', a.date_recorded) >24, 0, (".$last24hr_weightage."/(0.01+TIMESTAMPDIFF(HOUR, a.date_recorded, '".$now_date."'))))+(length(a.content)-length(replace(a.content,' ',''))+".$contentlength_weightage.")) as score";
 			$orderby_str = ' score DESC ';
 			$start1 = 'SELECT ';
 			$end1  = ' FROM ';
@@ -105,7 +119,8 @@ class BP_Loop_Filters {
 		$fromActivityTblWhere = $activityTbl.' a';
 		$sql = str_replace($fromActivityTblWhere,$from_subsql,$sql);
 		
-		$sql = apply_filters('buddyrank_sql_filter',$sql);
+		echo $sql = apply_filters('buddyrank_sql_filter',$sql);
+		exit;
 		return $sql;	
 	}
 	

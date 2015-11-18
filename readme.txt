@@ -117,3 +117,7 @@ You may like "BuddyPress Follow" plugin from url : https://wordpress.org/plugins
 =1.0.6=
 
 * Optimization
+
+=1.0.7=
+
+* Buddyrank Weightage added from wp-admin > plugin settings to make it change as per user demand.
