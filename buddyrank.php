@@ -119,8 +119,7 @@ class BP_Loop_Filters {
 		$fromActivityTblWhere = $activityTbl.' a';
 		$sql = str_replace($fromActivityTblWhere,$from_subsql,$sql);
 		
-		echo $sql = apply_filters('buddyrank_sql_filter',$sql);
-		exit;
+		$sql = apply_filters('buddyrank_sql_filter',$sql);
 		return $sql;	
 	}
 	
